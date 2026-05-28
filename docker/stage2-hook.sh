@@ -121,6 +121,15 @@ if [ -f "$HERMES_HOME/config.yaml" ]; then
     chmod 640 "$HERMES_HOME/config.yaml" 2>/dev/null || true
 fi
 
+# --- auth.json permissions ---
+# auth.json can be written by root (e.g. via docker exec which defaults
+# to root) while the gateway runs as hermes. Ensure hermes can always
+# read it on every boot, unconditionally.
+if [ -f "$HERMES_HOME/auth.json" ]; then
+    chown hermes:hermes "$HERMES_HOME/auth.json" 2>/dev/null || true
+    chmod 600 "$HERMES_HOME/auth.json" 2>/dev/null || true
+fi
+
 # --- Seed directory structure as hermes user ---
 # Run as hermes via s6-setuidgid so dirs end up owned correctly (matters
 # under rootless Podman where chown back to root would fail).
